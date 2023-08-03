@@ -15,14 +15,10 @@ class CreateStatesTable extends Migration
     public function up()
     {
         Schema::create('states', function (Blueprint $table) {
-            $table->increments('state_id');
+            $table->id();
             $table->string('name', 45);
             $table->string('abv', 45)->nullable();
-            $table->integer('country_id')->unsigned();
-
-            $table->foreign('country_id')
-                ->references('country_id')->on('countries');
-
+            $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
         });
     }
 

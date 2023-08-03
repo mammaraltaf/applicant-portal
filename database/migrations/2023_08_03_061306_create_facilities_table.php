@@ -15,12 +15,13 @@ class CreateFacilitiesTable extends Migration
     {
         Schema::create('facilities', function (Blueprint $table) {
             $table->id();
-            $table->string('facility');
+            $table->string('name');
             $table->string('address');
-            $table->string('city');
-            $table->string('state');
-            $table->string('zip');
-            $table->boolean('status')->default(false);
+            $table->foreignId('city_id')->constrained('cities');
+            $table->foreignId('state_id')->constrained('states');
+            $table->string('zipcode');
+            $table->foreignId('country_id')->constrained('countries');
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

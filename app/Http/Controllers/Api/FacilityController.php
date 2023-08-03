@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Classes\StatusEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\BaseController;
 use App\Http\Requests\Facility\FacilityRequest;
-use App\Http\Requests\Facility\UpdateFacilityRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\PaginateRequest;
 use App\Models\Facility;
-use Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FacilityController extends BaseController
 {
@@ -17,125 +17,122 @@ class FacilityController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(PaginateRequest $request)
     {
         try {
-            $facility = Facility::where('status', 0)
-                      ->with('Department')
-                      ->get();
-            return $this->sendResponse([$facility], 'All Facilities');
-            } catch (\Throwable $th)
-            {
-            return $this->sendError(['error' => $th->getMessage()]);
-            }
-    }
+            $facility = Facility::where('status', 'active')
+                ->with('departments')
+                ->paginate($request->per_page ?? 10);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+            return $this->sendResponse([$facility], 'All Facilities');
+        } catch (\Throwable $th) {
+            return $this->sendError(['error' => $th->getMessage()]);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(FacilityRequest $request)
     {
         try {
-            $facility = Facility::create($request->all());
-            if($facility)
-            {
-                return $this->sendResponse([], 'Facility Added Successfully');
-            }
+            DB::beginTransaction();
+            $facility = $this->storeOrUpdateFacility($request);
 
-            } catch (\Exception $e)
-            {
-            return $this->sendError(['error' => $e->getMessage()]);
+            if (isset($facility->id)) {
+                DB::commit();
+                return $this->sendResponse([$facility], 'Facility created successfully.');
             }
+            DB::rollBack();
+            return $this->sendError([$facility], 'Something went wrong! Please try again later.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError($e->getMessage(), 'Something went wrong! Please try again later.');
+        }
+    }
+
+    private function storeOrUpdateFacility($request)
+    {
+        try {
+            return Facility::updateOrCreate(
+                ['id' => $request->facility_id],
+                [
+                    'name' => $request->name ?? null,
+                    'address' => $request->address ?? null,
+                    'city_id' => $request->city_id ?? null,
+                    'state_id' => $request->state_id ?? null,
+                    'zipcode' => $request->zipcode ?? null,
+                    'country_id' => $request->country_id ?? null,
+                    'status' => $request->status ?? null
+                ]
+            );
+        } catch (\Exception $e) {
+            return $this->sendError('Error', $e->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        try {
+            $facility = Facility::whereId($id)->first();
+            /*check if facility found or not*/
+            if ($facility) {
+                return $this->sendResponse([$facility], 'Specific facility retrieved successfully.');
+            }
+            return $this->sendError([], 'Facility Not Found!');
+        } catch (\Exception $e) {
+            return $this->sendError('Error', $e->getMessage());
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateFacilityRequest $request)
+    public function update(Request $request, $id)
     {
+        DB::beginTransaction();
         try {
-            $facility = Facility::find($request->facilityId);
-            if ($facility) {
-                $facility->update([
-                    'facility' => $request->facility ?? $facility->facility,
-                    'address'  => $request->address ?? $facility->address,
-                    'city'     => $request->city ?? $facility->city,
-                    'state'    => $request->state ?? $facility->state,
-                    'zip'      => $request->zip ?? $facility->zip
-                ]);
-                return $this->sendResponse([], 'Facility Updated Successfully');
-            }else
-            {
-                return $this->sendResponse([], 'No Such Facility Exist');
-            }
-
+            $request['facility_id'] = (int)$id;
+            $facility = $this->storeOrUpdateFacility($request);
+            DB::commit();
+            return $this->sendResponse([$facility->fresh()], 'Facility updated successfully.');
         } catch (\Exception $e) {
-            return $this->sendError(['error' => $e->getMessage()]);
+            DB::rollBack();
+            return $this->sendError('Error', $e->getMessage());
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(UpdateFacilityRequest $request)
+    public function destroy($id)
     {
         try {
-            $facility = Facility::find($request->facilityId);
-            if ($facility) {
-                $facility->update([
-                    'status' => 1,
+            $facility = Facility::findOrFail($id);
+            $response = $facility->delete();
 
-                ]);
-                return $this->sendResponse([], 'Facility Deleted Successfully');
-            }else
-            {
-                return $this->sendResponse([], 'No Such Facility Exist');
+            if ($response) {
+                return $this->sendResponse([], 'Facility deleted successfully.');
             }
-
+            return $this->sendError([], 'Failed to delete the facility.');
         } catch (\Exception $e) {
-            return $this->sendError(['error' => $e->getMessage()]);
+            return $this->sendError('Error', $e->getMessage());
         }
     }
 }

@@ -26,11 +26,12 @@ class FacilityRequest extends FormRequest
     public function rules()
     {
         return [
-            'facility' => ['required'],
+            'name' => ['required'],
             'address'  => ['required'],
-            'city'     => ['required'],
-            'state'    => ['required'],
-            'zip'      => ['required']
+            'city_id'     => ['required', 'numeric' , 'exists:cities,id'],
+            'state_id'    => ['required', 'numeric' , 'exists:states,id'],
+            'country_id'  => ['required', 'numeric' , 'exists:countries,id'],
+            'zipcode'      => ['required']
         ];
     }
 
@@ -46,11 +47,12 @@ class FacilityRequest extends FormRequest
     public function messages()
     {
         return [
-            'facility.required' => 'facility is required',
+            'name.required' => 'facility name is required',
             'address.required'  => 'address is required',
-            'city.required'     => 'city is required',
-            'state.required'    => 'state is required',
-            'zip.required'      => 'zip is required'
+            'city_id.required'     => 'city is required',
+            'state_id.required'    => 'state is required',
+            'country_id.required'    => 'country is required',
+            'zipcode.required'      => 'zipcode is required'
         ];
     }
 }

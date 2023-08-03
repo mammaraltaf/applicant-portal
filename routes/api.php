@@ -1,11 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\FacilityController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
-use App\Http\Controllers\Api\ApplicationController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\FacilityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,10 +33,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('export-applications', [ApplicationController::class, 'exportApplications']);
 
 /*Routes for Facility*/
-    Route::post('facility/add',    [FacilityController::class, 'store']);
-    Route::get('facilities',       [FacilityController::class, 'index']);
-    Route::post('facility/update', [FacilityController::class, 'update']);
-    Route::post('facility/delete', [FacilityController::class, 'destroy']);
+    Route::apiResource('facilities', FacilityController::class);
 
 /*Routes for Department*/
     Route::post('department/add',    [DepartmentController::class, 'store']);
