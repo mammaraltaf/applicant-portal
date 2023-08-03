@@ -29,6 +29,10 @@ Route::post('application/add',    [ApplicationController::class, 'store']);
 /*Admin Routes*/
 Route::middleware(['auth:api', 'verified'])->group(function () {
 
+
+    /*export all applications*/
+    Route::get('export-applications', [ApplicationController::class, 'exportApplications']);
+
 /*Routes for Facility*/
     Route::post('facility/add',    [FacilityController::class, 'store']);
     Route::get('facilities',       [FacilityController::class, 'index']);
@@ -40,7 +44,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('department',         [DepartmentController::class, 'index']);
     Route::post('department/update', [DepartmentController::class, 'update']);
     Route::post('department/delete', [DepartmentController::class, 'destroy']);
-    
+
 /*Routes for Position*/
     Route::post('position/add',    [PositionController::class, 'store']);
     Route::get('position',         [PositionController::class, 'index']);

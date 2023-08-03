@@ -14,7 +14,7 @@ class Application extends Model
         'messageupdate', 'status'
     ];
 
-    public function Position()
+    public function position()
     {
         return $this->belongsTo(Position::class, 'position_id');
     }

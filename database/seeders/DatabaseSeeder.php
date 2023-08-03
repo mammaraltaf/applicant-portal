@@ -13,9 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this -> call([
+        $this->call([
             UserSeeder::class,
+            CountriesTableSeeder::class,
+            StatesTableSeeder::class,
         ]);
-        // \App\Models\User::factory(10)->create();
+
+        // Seeder of Cities by States
+        $numberOfStates = 51;
+
+        for ($stateNumber = 1; $stateNumber <= $numberOfStates; $stateNumber++) {
+            $seederClass = sprintf('Database\Seeders\state_cities\state%dTableSeeder', $stateNumber);
+            $this->call($seederClass);
+        }
     }
 }

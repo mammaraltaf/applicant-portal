@@ -15,7 +15,7 @@ class FacilityController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
@@ -24,9 +24,9 @@ class FacilityController extends BaseController
                       ->with('Department')
                       ->get();
             return $this->sendResponse([$facility], 'All Facilities');
-            } catch (\Throwable $th) 
+            } catch (\Throwable $th)
             {
-            return $this->sendError(['error' => $e->getMessage()]);
+            return $this->sendError(['error' => $th->getMessage()]);
             }
     }
 
@@ -44,7 +44,7 @@ class FacilityController extends BaseController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(FacilityRequest $request)
     {
@@ -55,7 +55,7 @@ class FacilityController extends BaseController
                 return $this->sendResponse([], 'Facility Added Successfully');
             }
 
-            } catch (\Exception $e) 
+            } catch (\Exception $e)
             {
             return $this->sendError(['error' => $e->getMessage()]);
             }
@@ -88,7 +88,7 @@ class FacilityController extends BaseController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateFacilityRequest $request)
     {
@@ -107,7 +107,7 @@ class FacilityController extends BaseController
             {
                 return $this->sendResponse([], 'No Such Facility Exist');
             }
-            
+
         } catch (\Exception $e) {
             return $this->sendError(['error' => $e->getMessage()]);
         }
@@ -117,7 +117,7 @@ class FacilityController extends BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(UpdateFacilityRequest $request)
     {
@@ -126,14 +126,14 @@ class FacilityController extends BaseController
             if ($facility) {
                 $facility->update([
                     'status' => 1,
-                    
+
                 ]);
                 return $this->sendResponse([], 'Facility Deleted Successfully');
             }else
             {
                 return $this->sendResponse([], 'No Such Facility Exist');
             }
-            
+
         } catch (\Exception $e) {
             return $this->sendError(['error' => $e->getMessage()]);
         }
