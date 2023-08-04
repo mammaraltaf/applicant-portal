@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\FacilityController;
+use App\Http\Controllers\Api\OtherController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,13 +23,18 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
+/*Country States and Cities*/
+Route::get('countries', [OtherController::class, 'getCountries']);
+Route::get('states/{id}', [OtherController::class, 'getStates']);
+Route::get('cities/{id}', [OtherController::class, 'getCities']);
+
 /*Application Form Routes*/
 Route::post('application/add',    [ApplicationController::class, 'store']);
 
 /*Admin Routes*/
 Route::middleware(['auth:api', 'verified'])->group(function () {
 
-
+    Route::get('dashboard', [OtherController::class, 'dashboard']);
     /*export all applications*/
     Route::get('export-applications', [ApplicationController::class, 'exportApplications']);
 

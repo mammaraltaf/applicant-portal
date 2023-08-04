@@ -15,7 +15,7 @@ class DepartmentController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -24,9 +24,9 @@ class DepartmentController extends BaseController
                       ->with('Position')
                       ->get();
             return $this->sendResponse([$department], 'All Department');
-            } catch (\Throwable $th) 
+            } catch (\Throwable $th)
             {
-            return $this->sendError(['error' => $e->getMessage()]);
+            return $this->sendError(['error' => $th->getMessage()]);
             }
     }
 
@@ -55,7 +55,7 @@ class DepartmentController extends BaseController
                 return $this->sendResponse([], 'Department Added Successfully');
             }
 
-            } catch (\Exception $e) 
+            } catch (\Exception $e)
             {
             return $this->sendError(['error' => $e->getMessage()]);
             }
@@ -103,7 +103,7 @@ class DepartmentController extends BaseController
             {
                 return $this->sendResponse([], 'No Such Department Exist');
             }
-            
+
         } catch (\Exception $e) {
             return $this->sendError(['error' => $e->getMessage()]);
         }
@@ -117,24 +117,24 @@ class DepartmentController extends BaseController
      */
     public function destroy(UpdaeDepartmentRequest $request)
     {
-        
+
         try {
             $department = Department::find($request->departmentId);
             if ($department) {
                 $department->update([
                     'status' => 1,
-                    
+
                 ]);
                 return $this->sendResponse([], 'Department Deleted Successfully');
             }else
             {
                 return $this->sendResponse([], 'No Such Department Exist');
             }
-            
+
         } catch (\Exception $e) {
             return $this->sendError(['error' => $e->getMessage()]);
         }
-            
-       
+
+
     }
 }
