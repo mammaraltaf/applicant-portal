@@ -38,8 +38,12 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     /*Export all applications*/
     Route::get('export-applications', [ApplicationController::class, 'exportApplications']);
 
-    /*Routes for facilities departments and positions*/
+    /*Routes for Facility*/
     Route::apiResource('facilities', FacilityController::class);
+
+    /*Routes for Department*/
     Route::apiResource('departments', DepartmentController::class);
+
+    /*Routes for Position*/
     Route::apiResource('positions', PositionController::class);
 });
