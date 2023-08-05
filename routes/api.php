@@ -35,21 +35,11 @@ Route::post('application/add',    [ApplicationController::class, 'store']);
 Route::middleware(['auth:api', 'verified'])->group(function () {
 
     Route::get('dashboard', [OtherController::class, 'dashboard']);
-    /*export all applications*/
+    /*Export all applications*/
     Route::get('export-applications', [ApplicationController::class, 'exportApplications']);
 
-/*Routes for Facility*/
+    /*Routes for facilities departments and positions*/
     Route::apiResource('facilities', FacilityController::class);
-
-/*Routes for Department*/
-    Route::post('department/add',    [DepartmentController::class, 'store']);
-    Route::get('department',         [DepartmentController::class, 'index']);
-    Route::post('department/update', [DepartmentController::class, 'update']);
-    Route::post('department/delete', [DepartmentController::class, 'destroy']);
-
-/*Routes for Position*/
-    Route::post('position/add',    [PositionController::class, 'store']);
-    Route::get('position',         [PositionController::class, 'index']);
-    Route::post('position/update', [PositionController::class, 'update']);
-    Route::post('position/delete', [PositionController::class, 'destroy']);
+    Route::apiResource('departments', DepartmentController::class);
+    Route::apiResource('positions', PositionController::class);
 });
