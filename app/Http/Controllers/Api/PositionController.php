@@ -15,18 +15,18 @@ class PositionController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function index(PaginateRequest $request)
     {
         try {
             $position = Position::where('status', 'active')
-                ->get($request->per_page ?? 10);
+                ->paginate($request->per_page ?? 10);
 
             return $this->sendResponse([$position], 'All Position');
-        } catch (\Throwable $th)
+        } catch (\Exception $e)
         {
-            return $this->sendError(['error' => $th->getMessage()]);
+            return $this->sendError(['error' => $e->getMessage()]);
         }
     }
 
@@ -34,27 +34,27 @@ class PositionController extends BaseController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function store(PositionRequest $request)
     {
         try {
             DB::beginTransaction();
-            $position = $this->storeOrUpdateDepartment($request);
+            $position = $this->storeOrUpdatePosition($request);
             if(isset($position->id))
             {
                 DB::commit();
                 return $this->sendResponse([$position], 'Position created successfully.');
             }
             DB::rollback();
-            return $this->sendError([], 'Something went wrong! Please try again later.');
+            return $this->sendError([$position], 'Something went wrong! Please try again later.');
         } catch (\Exception $e) {
             DB::rollback();
             return $this->sendError($e->getMessage(), 'Something went wrong! Please try again later.');
         }
     }
 
-    private function storeOrUpdateDepartment($request)
+    private function storeOrUpdatePosition($request)
     {
         try {
             return Position::updateOrCreate(
@@ -74,7 +74,7 @@ class PositionController extends BaseController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -105,18 +105,18 @@ class PositionController extends BaseController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-            $request['department_id'] = (int)$id;
-            $position = $this->storeOrUpdateDepartment($request);
+            $request['position_id'] = (int)$id;
+            $position = $this->storeOrUpdatePosition($request);
             DB::commit();
             return $this->sendResponse([$position->fresh()], 'Position updated successfully.');
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             return $this->sendError('Error', $e->getMessage());
         }
     }
@@ -125,7 +125,7 @@ class PositionController extends BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {

@@ -15,7 +15,7 @@ class DepartmentController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function index(PaginateRequest $request)
     {
@@ -33,7 +33,7 @@ class DepartmentController extends BaseController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function store(DepartmentRequest $request)
     {
@@ -46,7 +46,7 @@ class DepartmentController extends BaseController
                 return $this->sendResponse([$department], 'Department created successfully.');
             }
             DB::rollback();
-            return $this->sendError([], 'Something went wrong! Please try again later.');
+            return $this->sendError([$facility], 'Something went wrong! Please try again later.');
         } catch (\Exception $e) {
             DB::rollback();
             return $this->sendError($e->getMessage(), 'Something went wrong! Please try again later.');
@@ -56,7 +56,7 @@ class DepartmentController extends BaseController
     private function storeOrUpdateDepartment($request)
     {
         try {
-            return Deparment::updateOrCreate(
+            return Department::updateOrCreate(
                 ['id'  => $request->department_id],
                 [
                     'facility_id' => $request->facility_id ?? null,
@@ -73,7 +73,7 @@ class DepartmentController extends BaseController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -104,7 +104,7 @@ class DepartmentController extends BaseController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
@@ -124,7 +124,7 @@ class DepartmentController extends BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
