@@ -135,4 +135,26 @@ class FacilityController extends BaseController
             return $this->sendError('Error', $e->getMessage());
         }
     }
+
+    public function getClosestFacilities(Request $request)
+    {
+
+        $latitude = '-26.221960';
+        $longitude = '152.693770';
+        $apiKey = 'AIzaSyC8Odsu7K3zRev2p8EdVbn5-YyvcHWigVI';
+
+        $client = new Client();
+        $response = $client->get('https://maps.googleapis.com/maps/api/place/nearbysearch/json', [
+            'query' => [
+                'location' => $latitude . ',' . $longitude,
+                'rankby' => 'distance',
+                'type' => 'hospital', // e.g., restaurant, hospital, etc.
+                'key' => $apiKey,
+            ]
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return $data;
+        // Handle the data, and return the closest facilities to the client.
+    }
 }

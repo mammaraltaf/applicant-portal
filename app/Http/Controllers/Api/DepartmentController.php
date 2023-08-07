@@ -46,7 +46,7 @@ class DepartmentController extends BaseController
                 return $this->sendResponse([$department], 'Department created successfully.');
             }
             DB::rollback();
-            return $this->sendError([$facility], 'Something went wrong! Please try again later.');
+            return $this->sendError([$department], 'Something went wrong! Please try again later.');
         } catch (\Exception $e) {
             DB::rollback();
             return $this->sendError($e->getMessage(), 'Something went wrong! Please try again later.');
